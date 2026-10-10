@@ -19,8 +19,13 @@ public class RecipeResponse {
     private String instructions;
     private String imageUrl;
     private Integer prepTime;
+    private Integer cookTime;
     private Integer servings;
+    private String difficulty;
+    private Integer likeCount;
+    private Long categoryId;
     private String categoryName;
+    private String categorySlug;
     private String authorUsername;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -20,13 +20,17 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     // Search recipes by title (case-insensitive)
     List<Recipe> findByTitleContainingIgnoreCase(String keyword);
 
-    // Search by title OR description
+    // Search by title OR description OR ingredients
     @Query("SELECT r FROM Recipe r WHERE " +
             "LOWER(r.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(r.description) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+            "LOWER(r.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(r.ingredients) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Recipe> searchRecipes(@Param("keyword") String keyword);
 
     // Find by category slug
     @Query("SELECT r FROM Recipe r WHERE r.category.slug = :slug")
     List<Recipe> findByCategorySlug(@Param("slug") String slug);
+
+    // Find top trending recipes by likes
+    List<Recipe> findTop10ByOrderByLikeCountDesc();
 }

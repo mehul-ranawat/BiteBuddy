@@ -3,6 +3,10 @@ package com.mehul.recipeapi.controller;
 import com.mehul.recipeapi.dto.RecipeRequest;
 import com.mehul.recipeapi.dto.RecipeResponse;
 import com.mehul.recipeapi.service.RecipeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,63 +19,92 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/recipes")
 @RequiredArgsConstructor
+@Tag(name = "Recipes", description = "Recipe publishing, discovery, and community engagement")
 public class RecipeController {
 
     private final RecipeService recipeService;
 
-    // GET /api/recipes — get all recipes
     @GetMapping
+    @Operation(summary = "Get all recipes", description = "Retrieve a list of all published recipes across the platform")
     public ResponseEntity<List<RecipeResponse>> getAllRecipes() {
         return ResponseEntity.ok(recipeService.getAllRecipes());
     }
 
-    // GET /api/recipes/{id} — get single recipe
+    @GetMapping("/trending")
+    @Operation(summary = "Get trending recipes", description = "Retrieve top 10 recipes sorted by community likes")
+    public ResponseEntity<List<RecipeResponse>> getTrendingRecipes() {
+        return ResponseEntity.ok(recipeService.getTrendingRecipes());
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<RecipeResponse> getRecipeById(@PathVariable Long id) {
+    @Operation(summary = "Get recipe by ID", description = "Fetch detailed information for a single recipe including ingredients and instructions")
+    public ResponseEntity<RecipeResponse> getRecipeById(
+            @Parameter(description = "ID of the recipe to retrieve") @PathVariable Long id) {
         return ResponseEntity.ok(recipeService.getRecipeById(id));
     }
 
-    // GET /api/recipes/search?q=pasta — search by keyword
     @GetMapping("/search")
-    public ResponseEntity<List<RecipeResponse>> searchRecipes(@RequestParam String q) {
+    @Operation(summary = "Search recipes by keyword", description = "Search recipes by matching terms in title, description, or ingredients")
+    public ResponseEntity<List<RecipeResponse>> searchRecipes(
+            @Parameter(description = "Keyword to search for (e.g., pasta, chicken, chocolate)") @RequestParam String q) {
         return ResponseEntity.ok(recipeService.searchRecipes(q));
     }
 
-    // GET /api/recipes/category/vegan — filter by category slug
     @GetMapping("/category/{slug}")
-    public ResponseEntity<List<RecipeResponse>> getByCategory(@PathVariable String slug) {
+    @Operation(summary = "Filter recipes by category slug", description = "Retrieve all recipes organized under a specific category (e.g., italian, desserts)")
+    public ResponseEntity<List<RecipeResponse>> getByCategory(
+            @Parameter(description = "Category slug name") @PathVariable String slug) {
         return ResponseEntity.ok(recipeService.getRecipesByCategory(slug));
     }
 
-    // GET /api/recipes/my — get logged-in user's recipes
     @GetMapping("/my")
+    @Operation(summary = "Get current user recipes", description = "Fetch all recipes created by the currently authenticated user", security = @SecurityRequirement(name = "Bearer Authentication"))
     public ResponseEntity<List<RecipeResponse>> getMyRecipes(
             @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
         return ResponseEntity.ok(recipeService.getMyRecipes(userDetails.getUsername()));
     }
 
-    // POST /api/recipes — create a new recipe (auth required)
     @PostMapping
+    @Operation(summary = "Create a new recipe", description = "Publish a new recipe with ingredients, steps, category, and cooking times", security = @SecurityRequirement(name = "Bearer Authentication"))
     public ResponseEntity<RecipeResponse> createRecipe(
             @Valid @RequestBody RecipeRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
         return ResponseEntity.ok(recipeService.createRecipe(request, userDetails.getUsername()));
     }
 
-    // PUT /api/recipes/{id} — update a recipe (owner only)
     @PutMapping("/{id}")
+    @Operation(summary = "Update a recipe", description = "Update an existing recipe (Owner authorization required)", security = @SecurityRequirement(name = "Bearer Authentication"))
     public ResponseEntity<RecipeResponse> updateRecipe(
-            @PathVariable Long id,
+            @Parameter(description = "ID of the recipe to update") @PathVariable Long id,
             @Valid @RequestBody RecipeRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
         return ResponseEntity.ok(recipeService.updateRecipe(id, request, userDetails.getUsername()));
     }
 
-    // DELETE /api/recipes/{id} — delete a recipe (owner only)
+    @PostMapping("/{id}/like")
+    @Operation(summary = "Like a recipe", description = "Increment the like count for a recipe (Community engagement)")
+    public ResponseEntity<RecipeResponse> likeRecipe(
+            @Parameter(description = "ID of the recipe to like") @PathVariable Long id) {
+        return ResponseEntity.ok(recipeService.likeRecipe(id));
+    }
+
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a recipe", description = "Permanently delete a recipe (Owner authorization required)", security = @SecurityRequirement(name = "Bearer Authentication"))
     public ResponseEntity<String> deleteRecipe(
-            @PathVariable Long id,
+            @Parameter(description = "ID of the recipe to delete") @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
         recipeService.deleteRecipe(id, userDetails.getUsername());
         return ResponseEntity.ok("Recipe deleted successfully");
     }

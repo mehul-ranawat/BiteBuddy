@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,16 +30,40 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Public auth endpoints
+                        // Static Resources & Frontend
+                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+
+                        // Swagger UI & OpenAPI Specification
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
+
+                        // Health check probe
+                        .requestMatchers("/api/health").permitAll()
+
+                        // Public Auth Endpoints
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Public GET endpoints - allow everyone to read recipes and categories
-                        .requestMatchers(HttpMethod.GET, "/api/recipes").permitAll()
+
+                        // Protected user profile and personal recipes (Must be matched before general /api/**)
+                        .requestMatchers("/api/recipes/my").authenticated()
+                        .requestMatchers("/api/users/me").authenticated()
+
+                        // Public GET Endpoints
                         .requestMatchers(HttpMethod.GET, "/api/recipes/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
-                        // POST, PUT, DELETE require authentication
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
+
+                        // Community Likes (public engagement)
+                        .requestMatchers(HttpMethod.POST, "/api/recipes/*/like").permitAll()
+
+                        // Recipe/Category modifications require authentication
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
