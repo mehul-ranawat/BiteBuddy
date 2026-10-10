@@ -6,8 +6,8 @@ import com.mehul.recipeapi.entity.User;
 import com.mehul.recipeapi.repository.CategoryRepository;
 import com.mehul.recipeapi.repository.RecipeRepository;
 import com.mehul.recipeapi.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -15,14 +15,24 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class DataInitializer implements CommandLineRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
 
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final RecipeRepository recipeRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public DataInitializer(CategoryRepository categoryRepository,
+                           UserRepository userRepository,
+                           RecipeRepository recipeRepository,
+                           PasswordEncoder passwordEncoder) {
+        this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
+        this.recipeRepository = recipeRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public void run(String... args) {

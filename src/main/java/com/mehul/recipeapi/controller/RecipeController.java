@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,11 +17,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/recipes")
-@RequiredArgsConstructor
 @Tag(name = "Recipes", description = "Recipe publishing, discovery, and community engagement")
 public class RecipeController {
 
     private final RecipeService recipeService;
+
+    public RecipeController(RecipeService recipeService) {
+        this.recipeService = recipeService;
+    }
 
     @GetMapping
     @Operation(summary = "Get all recipes", description = "Retrieve a list of all published recipes across the platform")

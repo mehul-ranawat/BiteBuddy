@@ -8,7 +8,6 @@ import com.mehul.recipeapi.entity.User;
 import com.mehul.recipeapi.repository.CategoryRepository;
 import com.mehul.recipeapi.repository.RecipeRepository;
 import com.mehul.recipeapi.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,12 +15,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class RecipeService {
 
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+
+    public RecipeService(RecipeRepository recipeRepository,
+                         UserRepository userRepository,
+                         CategoryRepository categoryRepository) {
+        this.recipeRepository = recipeRepository;
+        this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
+    }
 
     // Get all recipes
     public List<RecipeResponse> getAllRecipes() {

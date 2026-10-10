@@ -1,234 +1,198 @@
-# 🍴 BiteBuddy — Recipe Sharing Platform API
+# 🍴 Bite Buddy — Recipe Sharing Platform & REST API
 
-![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen?style=flat-square&logo=springboot)
-![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?style=flat-square&logo=mysql)
-![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=flat-square&logo=docker)
-![Render](https://img.shields.io/badge/Deployed-Render-46E3B7?style=flat-square&logo=render)
-![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
+![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen?style=for-the-badge&logo=springboot&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?style=for-the-badge&logo=mysql&logoColor=white)
+![Swagger OpenAPI 3](https://img.shields.io/badge/OpenAPI%203-Swagger%20UI-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
+![Railway](https://img.shields.io/badge/Deployed-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
-A production-ready **RESTful API** for a recipe sharing platform built with **Java 21** and **Spring Boot 3**. Features full JWT-based authentication, recipe CRUD operations, category management, and keyword search — all deployed live on Render with a Railway MySQL database.
-
-🌐 **Live API:** [https://bitebuddy-nb4t.onrender.com](https://bitebuddy-nb4t.onrender.com)
-
----
-
-## 📋 Table of Contents
-
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Architecture](#-architecture)
-- [API Endpoints](#-api-endpoints)
-- [Getting Started](#-getting-started)
-- [Environment Variables](#-environment-variables)
-- [Project Structure](#-project-structure)
-- [Testing](#-testing)
+**Bite Buddy** is a production-ready, full-featured **Recipe Sharing Platform and REST API** engineered with **Java 21** and **Spring Boot 3**. Designed for food enthusiasts and developers, it delivers complete JWT authentication, layered CRUD architecture, category taxonomies, keyword search, user profiles, community likes, and an interactive modern web dashboard with live Swagger documentation.
 
 ---
 
-## ✨ Features
+## 🌐 Live Demonstrations & Links
 
-- 🔐 **JWT Authentication** — Secure register & login with Bearer token
-- 📖 **Recipe CRUD** — Create, read, update, delete recipes
-- 🏷️ **Categories** — Organize recipes by category with auto-generated slugs
-- 🔍 **Search & Filter** — Search recipes by keyword or filter by category
-- 👤 **User Ownership** — Only recipe owners can edit or delete their recipes
-- 🖼️ **Image URL Support** — Attach image URLs to recipes
-- ⚡ **Global Exception Handling** — Clean, consistent error responses
-- 🐳 **Dockerized** — Multi-stage Docker build for easy deployment
+* 🚀 **Live Web Platform & API:** [https://bitebuddy-production.up.railway.app/](https://bitebuddy-production.up.railway.app/)
+* 📖 **Interactive Swagger UI Docs:** [https://bitebuddy-production.up.railway.app/swagger-ui.html](https://bitebuddy-production.up.railway.app/swagger-ui.html)
+* 🩺 **Health Check Probe:** [https://bitebuddy-production.up.railway.app/api/health](https://bitebuddy-production.up.railway.app/api/health)
+* 📁 **Postman Collection:** [`docs/BiteBuddy.postman_collection.json`](docs/BiteBuddy.postman_collection.json)
 
 ---
 
-## 🛠 Tech Stack
+## ✨ Key Features
 
-| Layer | Technology |
-|---|---|
-| Language | Java 21 |
-| Framework | Spring Boot 3.2.5 |
-| Security | Spring Security + JWT (jjwt 0.11.5) |
-| Database | MySQL 8 (Railway) |
-| ORM | Spring Data JPA + Hibernate |
-| Build Tool | Maven |
-| Containerization | Docker |
-| Deployment | Render |
+* 🔐 **Stateless JWT Authentication** — Secure registration & login with BCrypt password encryption and Spring Security filter chains.
+* 📖 **Detailed Recipe Publishing** — Create, update, and manage recipes with ingredients, step-by-step instructions, prep/cook times, servings, difficulty ratings, and category associations.
+* 🔍 **Recipe Discovery & Search** — Search recipes by keyword across titles, descriptions, and ingredients (`/api/recipes/search?q=...`), or filter by category slug (`/api/recipes/category/{slug}`).
+* 👤 **User Management & Profiles** — Dedicated chef profiles (`/api/users/{username}`, `/api/users/me`) with published recipe counts and creation history.
+* ❤️ **Community Engagement** — Instant recipe like system (`POST /api/recipes/{id}/like`) and trending recipe discovery (`/api/recipes/trending`).
+* 🎨 **Interactive Live Web Dashboard** — Glassmorphic web UI served directly from Spring Boot (`/`) with instant search, category filters, and recipe modal views.
+* 🌱 **Automated Data Seeder** — Populates categories and delicious sample recipes (Carbonara, Avocado Toast, Butter Chicken, Lava Cake) on first boot.
+* 🛡️ **Enterprise Security & CORS** — Parameterized environment variables for zero secret leakage, pre-configured CORS, and role-based ownership checks.
 
 ---
 
-## 🏗 Architecture
+## 🏗 System Architecture
 
 ```
-Client (Postman / Frontend)
-        │
-        ▼
-  Spring Security Filter (JWT validation)
-        │
-        ▼
-  REST Controllers  (/api/auth, /api/recipes, /api/categories)
-        │
-        ▼
-  Service Layer  (business logic)
-        │
-        ▼
-  Repository Layer  (Spring Data JPA)
-        │
-        ▼
-  MySQL Database (Railway)
+                                  ┌───────────────────────────────┐
+                                  │   Clients / Web UI / Postman  │
+                                  └───────────────┬───────────────┘
+                                                  │
+                                                  ▼
+                                  ┌───────────────────────────────┐
+                                  │    CORS & Security Filter     │
+                                  │      (JwtAuthFilter)          │
+                                  └───────────────┬───────────────┘
+                                                  │
+                                                  ▼
+                      ┌───────────────────────────────────────────────────────┐
+                      │                   REST Controllers                    │
+                      │  AuthController  │ RecipeController │ UserController  │
+                      │         CategoryController │ HealthController         │
+                      └───────────────────────────┬───────────────────────────┘
+                                                  │
+                                                  ▼
+                      ┌───────────────────────────────────────────────────────┐
+                      │                    Service Layer                      │
+                      │    AuthService   │   RecipeService  │   UserService   │
+                      │                 CategoryService                       │
+                      └───────────────────────────┬───────────────────────────┘
+                                                  │
+                                                  ▼
+                      ┌───────────────────────────────────────────────────────┐
+                      │             Data Access Layer (JPA/Hibernate)         │
+                      │    UserRepository │ RecipeRepository │ CategoryRepo   │
+                      └───────────────────────────┬───────────────────────────┘
+                                                  │
+                                                  ▼
+                                  ┌───────────────────────────────┐
+                                  │     MySQL Database (Railway)  │
+                                  └───────────────────────────────┘
 ```
 
 ---
 
-## 📡 API Endpoints
+## 📡 API Reference Table
 
-### Auth (Public)
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/auth/register` | Register a new user |
-| POST | `/api/auth/login` | Login and get JWT token |
-
-### Recipes
+### 🔐 Authentication (`/api/auth`)
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| GET | `/api/recipes` | ❌ | Get all recipes |
-| GET | `/api/recipes/{id}` | ❌ | Get recipe by ID |
-| GET | `/api/recipes/search?q={keyword}` | ❌ | Search recipes by keyword |
-| GET | `/api/recipes/category/{slug}` | ❌ | Filter by category |
-| GET | `/api/recipes/my` | ✅ | Get my recipes |
-| POST | `/api/recipes` | ✅ | Create a new recipe |
-| PUT | `/api/recipes/{id}` | ✅ | Update a recipe (owner only) |
-| DELETE | `/api/recipes/{id}` | ✅ | Delete a recipe (owner only) |
+| `POST` | `/api/auth/register` | Public | Register a new user account & get JWT token |
+| `POST` | `/api/auth/login` | Public | Login with username/password & get JWT token |
 
-### Categories
+### 📖 Recipes (`/api/recipes`)
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| GET | `/api/categories` | ❌ | Get all categories |
-| GET | `/api/categories/{id}` | ❌ | Get category by ID |
-| POST | `/api/categories` | ✅ | Create a category |
-| DELETE | `/api/categories/{id}` | ✅ | Delete a category |
+| `GET` | `/api/recipes` | Public | Retrieve all published recipes |
+| `GET` | `/api/recipes/trending` | Public | Retrieve top 10 trending recipes by likes |
+| `GET` | `/api/recipes/{id}` | Public | Get single recipe by ID with full steps & ingredients |
+| `GET` | `/api/recipes/search?q={keyword}` | Public | Search recipes by title, description, or ingredients |
+| `GET` | `/api/recipes/category/{slug}` | Public | Filter recipes by category slug (`italian`, `desserts`, etc.) |
+| `GET` | `/api/recipes/my` | Bearer JWT | Retrieve recipes created by authenticated user |
+| `POST` | `/api/recipes` | Bearer JWT | Create and publish a new recipe |
+| `POST` | `/api/recipes/{id}/like` | Public | Increment community like counter for a recipe |
+| `PUT` | `/api/recipes/{id}` | Bearer JWT | Update an existing recipe (Owner only) |
+| `DELETE` | `/api/recipes/{id}` | Bearer JWT | Delete a recipe (Owner only) |
+
+### 🏷️ Categories (`/api/categories`)
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/categories` | Public | Get all available categories |
+| `GET` | `/api/categories/{id}` | Public | Get category details by ID |
+| `POST` | `/api/categories` | Bearer JWT | Create a new category with auto-generated slug |
+| `DELETE` | `/api/categories/{id}` | Bearer JWT | Delete a category |
+
+### 👤 User Profiles & Health (`/api/users`, `/api/health`)
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/users/me` | Bearer JWT | Retrieve current authenticated user profile & stats |
+| `GET` | `/api/users/{username}` | Public | Retrieve public profile and recipes of any chef |
+| `GET` | `/api/health` | Public | Health check and deployment status probe |
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started Locally
 
 ### Prerequisites
-- Java 21
-- Maven
-- MySQL 8 (local or cloud)
+* **Java 21** or higher
+* **Maven 3.8+** (or included Maven Wrapper `./mvnw`)
+* **MySQL 8** (local or cloud)
 
-### Run Locally
-
+### 1. Clone & Navigate
 ```bash
-# Clone the repository
-git clone https://github.com/YOUR_USERNAME/recipe-api.git
+git clone https://github.com/mehul-ranawat/recipe-api.git
 cd recipe-api
-
-# Configure your database credentials in
-# src/main/resources/application.properties
-
-# Run the application
-mvn spring-boot:run
 ```
 
-The API will start at `http://localhost:8080`
+### 2. Configure Database & Secrets
+Set your local environment variables or update `src/main/resources/application.properties`:
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/recipe_db?useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=your_password
+app.jwt.secret=your_super_secret_jwt_key_at_least_256_bits
+```
 
-### Run with Docker
+### 3. Run the Application
+```bash
+# Using Maven wrapper
+./mvnw spring-boot:run
+
+# Or on Windows PowerShell:
+.\mvnw.cmd spring-boot:run
+```
+
+The application will start on `http://localhost:8080`:
+* Web Dashboard: `http://localhost:8080/`
+* Swagger UI Docs: `http://localhost:8080/swagger-ui.html`
+
+---
+
+## 🐳 Docker Containerization
+
+Build and run using Docker:
 
 ```bash
-# Build the Docker image
+# Build Docker image
 docker build -t bitebuddy .
 
-# Run the container
+# Run Docker container
 docker run -p 8080:8080 \
-  -e SPRING_DATASOURCE_URL=your_db_url \
-  -e SPRING_DATASOURCE_USERNAME=your_username \
+  -e SPRING_DATASOURCE_URL=your_mysql_connection_string \
+  -e SPRING_DATASOURCE_USERNAME=your_user \
   -e SPRING_DATASOURCE_PASSWORD=your_password \
   -e APP_JWT_SECRET=your_jwt_secret \
   bitebuddy
 ```
----
-
-## 📁 Project Structure
-
-```
-src/main/java/com/mehul/recipeapi/
-├── config/
-│   ├── JwtAuthFilter.java       # JWT request filter
-│   └── SecurityConfig.java      # Spring Security configuration
-├── controller/
-│   ├── AuthController.java      # Register & login endpoints
-│   ├── RecipeController.java    # Recipe CRUD endpoints
-│   └── CategoryController.java  # Category endpoints
-├── dto/
-│   ├── AuthRequest.java         # Register request body
-│   ├── LoginRequest.java        # Login request body
-│   ├── AuthResponse.java        # Auth response with token
-│   ├── RecipeRequest.java       # Create/update recipe body
-│   ├── RecipeResponse.java      # Recipe response shape
-│   └── CategoryRequest.java     # Create category body
-├── entity/
-│   ├── User.java                # User table
-│   ├── Recipe.java              # Recipe table
-│   └── Category.java            # Category table
-├── exception/
-│   └── GlobalExceptionHandler.java  # Centralized error handling
-├── repository/
-│   ├── UserRepository.java      # User DB queries
-│   ├── RecipeRepository.java    # Recipe DB queries (incl. search)
-│   └── CategoryRepository.java  # Category DB queries
-├── security/
-│   ├── JwtUtil.java             # JWT generation & validation
-│   └── UserDetailsServiceImpl.java  # Load user from DB
-└── service/
-    ├── AuthService.java         # Auth business logic
-    ├── RecipeService.java       # Recipe business logic
-    └── CategoryService.java     # Category business logic
-```
 
 ---
 
-## 🧪 Testing
+## 🚂 Railway Deployment Guide
 
-Import this collection into Postman to test all endpoints:
+1. Create a new project on [Railway.app](https://railway.app/).
+2. Add a **MySQL** database service on Railway.
+3. Add a **GitHub Repo** service and select `mehul-ranawat/recipe-api`.
+4. Under **Variables**, add:
+   * `SPRING_DATASOURCE_URL`: `${{MySQL.DATABASE_URL}}`
+   * `SPRING_DATASOURCE_USERNAME`: `${{MySQL.MYSQLUSER}}`
+   * `SPRING_DATASOURCE_PASSWORD`: `${{MySQL.MYSQLPASSWORD}}`
+   * `APP_JWT_SECRET`: `your-random-jwt-secret-key`
+5. Railway will automatically build via Dockerfile and deploy to `https://bitebuddy-production.up.railway.app/`.
 
-**1. Register**
-```json
-POST /api/auth/register
-{
-  "username": "testuser",
-  "email": "test@example.com",
-  "password": "123456"
-}
-```
+---
 
-**2. Login**
-```json
-POST /api/auth/login
-{
-  "username": "testuser",
-  "password": "123456"
-}
-```
+## 🧪 Testing with Postman
 
-**3. Create Recipe** *(add `Authorization: Bearer <token>` header)*
-```json
-POST /api/recipes
-{
-  "title": "Spaghetti Carbonara",
-  "description": "Classic Italian pasta",
-  "ingredients": "Spaghetti, eggs, pancetta, parmesan",
-  "instructions": "Cook pasta, fry pancetta, mix eggs and cheese, combine.",
-  "prepTime": 30,
-  "servings": 2,
-  "categoryId": 1
-}
-```
-
-**4. Search Recipes**
-```
-GET /api/recipes/search?q=pasta
-```
+1. Open Postman.
+2. Click **Import** -> Select `docs/BiteBuddy.postman_collection.json`.
+3. Set the `baseUrl` collection variable to `http://localhost:8080` (local) or `https://bitebuddy-production.up.railway.app` (live).
+4. Execute `POST /api/auth/login` — the JWT token is automatically saved into the environment!
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the LICENSE file for details.

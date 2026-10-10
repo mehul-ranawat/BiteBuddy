@@ -4,17 +4,20 @@ import com.mehul.recipeapi.dto.RecipeResponse;
 import com.mehul.recipeapi.dto.UserProfileResponse;
 import com.mehul.recipeapi.entity.User;
 import com.mehul.recipeapi.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final RecipeService recipeService;
+
+    public UserService(UserRepository userRepository, RecipeService recipeService) {
+        this.userRepository = userRepository;
+        this.recipeService = recipeService;
+    }
 
     public UserProfileResponse getUserProfile(String username) {
         User user = userRepository.findByUsername(username)

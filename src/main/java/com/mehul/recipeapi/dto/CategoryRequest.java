@@ -1,11 +1,26 @@
 package com.mehul.recipeapi.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 
-@Data
 public class CategoryRequest {
 
     @NotBlank(message = "Category name is required")
+    @Schema(example = "Mediterranean")
     private String name;
+
+    public CategoryRequest() {
+    }
+
+    public CategoryRequest(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

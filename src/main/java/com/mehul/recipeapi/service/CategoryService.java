@@ -3,16 +3,18 @@ package com.mehul.recipeapi.service;
 import com.mehul.recipeapi.dto.CategoryRequest;
 import com.mehul.recipeapi.entity.Category;
 import com.mehul.recipeapi.repository.CategoryRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+
+    public CategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
 
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
